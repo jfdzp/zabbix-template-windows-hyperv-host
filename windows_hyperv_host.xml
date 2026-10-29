@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+  <version>7.4</version>
+  <template_groups>
+    <template_group>
+      <uuid>14bb266fc3fc496095a704a4a847ebdf</uuid>
+      <name>Templates/Operating systems</name>
+    </template_group>
+  </template_groups>
+  <templates>
+    <template>
+      <uuid>f7b0b93aea3c45078bbbd47a5f408feb</uuid>
+      <template>Windows HyperV Host</template>
+      <name>Windows HyperV Host</name>
+      <description>Template for Windows Hyper-V virtualization hosts.&#13;
+&#13;
+Monitors: Hyper-V services, CrowdStrike EDR, SMB file sharing&#13;
+&#13;
+Requirements:&#13;
+- Zabbix Agent 2 installed&#13;
+- Use together with the Windows Base template</description>
+      <groups>
+        <group>
+          <name>Templates/Operating systems</name>
+        </group>
+      </groups>
+
+      <items>
+
+        <!-- Hyper-V Host Compute Service -->
+        <item>
+          <uuid>a9e2ec8f30d84cf993cd568fab5d0e38</uuid>
+          <name>Service: Hyper-V Host Compute Service</name>
+          <type>ZABBIX_ACTIVE</type>
+          <key>service.info[vmcompute,state]</key>
+          <delay>60s</delay>
+          <description>State of the Hyper-V Host Compute Service. 0=Running, 6=Stopped</description>
+          <valuemap>
+            <name>Windows Service State</name>
+          </valuemap>
+          <tags>
+            <tag><tag>component</tag><value>hyperv</value></tag>
+          </tags>
+          <triggers>
+            <trigger>
+              <uuid>c6f35a14eb0d4d75a82533e7d3e4cc21</uuid>
+              <expression>last(/Windows HyperV Host/service.info[vmcompute,state])=6</expression>
+              <name>CRITICAL: Hyper-V Host Compute Service stopped on {HOST.NAME}</name>
+              <priority>HIGH</priority>
+              <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+              <recovery_expression>last(/Windows HyperV Host/service.info[vmcompute,state])=0</recovery_expression>
+            </trigger>
+          </triggers>
+        </item>
+
+        <!-- Hyper-V Virtual Machine Management -->
+        <item>
+          <uuid>52fde728c2b74106a7aea5e36337e4bf</uuid>
+          <name>Service: Hyper-V Virtual Machine Management</name>
+          <type>ZABBIX_ACTIVE</type>
+          <key>service.info[vmms,state]</key>
+          <delay>60s</delay>
+          <description>State of the Hyper-V Virtual Machine Management service. 0=Running, 6=Stopped</description>
+          <valuemap>
+            <name>Windows Service State</name>
+          </valuemap>
+          <tags>
+            <tag><tag>component</tag><value>hyperv</value></tag>
+          </tags>
+          <triggers>
+            <trigger>
+              <uuid>a290516940d74bcea08013e82bb4ac2e</uuid>
+              <expression>last(/Windows HyperV Host/service.info[vmms,state])=6</expression>
+              <name>CRITICAL: Hyper-V Virtual Machine Management stopped on {HOST.NAME}</name>
+              <priority>HIGH</priority>
+              <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+              <recovery_expression>last(/Windows HyperV Host/service.info[vmms,state])=0</recovery_expression>
+            </trigger>
+          </triggers>
+        </item>
+
+        <!-- EDR agent -->
+        <item>
+          <uuid>4932636a909d4ba3861e58382ddfa9b1</uuid>
+          <name>Service: CrowdStrike Falcon (EDR)</name>
+          <type>ZABBIX_ACTIVE</type>
+          <key>service.info[CSFalconService,state]</key>
+          <delay>60s</delay>
+          <description>State of the CrowdStrike Falcon (EDR) service. 0=Running, 6=Stopped</description>
+          <valuemap>
+            <name>Windows Service State</name>
+          </valuemap>
+          <tags>
+            <tag><tag>component</tag><value>security</value></tag>
+          </tags>
+          <triggers>
+            <trigger>
+              <uuid>bef8f764a3a54c44b21bcc278b7b60bb</uuid>
+              <expression>last(/Windows HyperV Host/service.info[CSFalconService,state])=6</expression>
+              <name>CRITICAL: CrowdStrike Falcon stopped on {HOST.NAME}</name>
+              <priority>HIGH</priority>
+              <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+              <recovery_expression>last(/Windows HyperV Host/service.info[CSFalconService,state])=0</recovery_expression>
+            </trigger>
+          </triggers>
+        </item>
+
+        <!-- LanmanServer -->
+        <item>
+          <uuid>49e8124b9a3047f6a9e4f4fc32e1dfd7</uuid>
+          <name>Service: Server (SMB File Sharing)</name>
+          <type>ZABBIX_ACTIVE</type>
+          <key>service.info[LanmanServer,state]</key>
+          <delay>60s</delay>
+          <description>State of the LanmanServer (SMB) service. 0=Running, 6=Stopped</description>
+          <valuemap>
+            <name>Windows Service State</name>
+          </valuemap>
+          <tags>
+            <tag><tag>component</tag><value>file-service</value></tag>
+          </tags>
+          <triggers>
+            <trigger>
+              <uuid>57f4ffd287814a74a4f0f1925f8440c3</uuid>
+              <expression>last(/Windows HyperV Host/service.info[LanmanServer,state])=6</expression>
+              <name>WARNING: SMB File Sharing (LanmanServer) stopped on {HOST.NAME}</name>
+              <priority>WARNING</priority>
+              <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+              <recovery_expression>last(/Windows HyperV Host/service.info[LanmanServer,state])=0</recovery_expression>
+            </trigger>
+          </triggers>
+        </item>
+
+      </items>
+
+      <!-- WERTZUORDNUNGEN -->
+      <valuemaps>
+        <valuemap>
+          <uuid>ef82cb08d8914d55940fbf2b31b31c78</uuid>
+          <name>Windows Service State</name>
+          <mappings>
+            <mapping><value>0</value><newvalue>Running</newvalue></mapping>
+            <mapping><value>1</value><newvalue>Paused</newvalue></mapping>
+            <mapping><value>2</value><newvalue>Start Pending</newvalue></mapping>
+            <mapping><value>3</value><newvalue>Pause Pending</newvalue></mapping>
+            <mapping><value>4</value><newvalue>Continue Pending</newvalue></mapping>
+            <mapping><value>5</value><newvalue>Stop Pending</newvalue></mapping>
+            <mapping><value>6</value><newvalue>Stopped</newvalue></mapping>
+            <mapping><value>7</value><newvalue>Unknown</newvalue></mapping>
+          </mappings>
+        </valuemap>
+      </valuemaps>
+
+    </template>
+  </templates>
+</zabbix_export>
